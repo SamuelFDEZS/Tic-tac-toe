@@ -1,9 +1,11 @@
+import { useState } from "react";
+import confetti from "canvas-confetti";
+
+
 const TURNS = {
   X: 'x',
   O: 'o'
 }
-
-import { useState } from "react"
 
 const Square = ({ children, isSelected, updateBoard, index }) => {
   const handleClick = () => {
@@ -53,6 +55,10 @@ function App() {
     setTurn(TURNS.X)
     setWinner(null)
   }
+
+  const checkEndGame = (newBoard) => {
+    return newBoard.every((square) => square !== null)
+  }
   const updateBoard = (index) => {
     if (board[index] || winner) return
     //We manage turns
@@ -66,7 +72,12 @@ function App() {
     console.log(board)
 
     const newWinner = checkWinner(newBoard)
-    setWinner(newWinner)
+    if(newWinner){
+      confetti()
+      setWinner(newWinner)
+    } else if(checkEndGame(newBoard)){
+      setWinner(false)
+    }
   }
 
 
@@ -75,16 +86,17 @@ function App() {
   return (
     <main className='board'>
       <h1>Tic Tac Toe</h1>
+      <button onClick={resetGame}>Reset game</button>
       <section className='game'>
         {
-          board.map((_, index) => {
+          board.map((square, index) => {
             return (
               <Square
                 key={index}
                 index={index}
                 updateBoard={updateBoard}
               >
-                {board[index]}
+                {square}
               </Square>
             )
           })
