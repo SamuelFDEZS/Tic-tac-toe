@@ -1,27 +1,14 @@
 import { useState } from "react";
 import confetti from "canvas-confetti";
 import { Square } from "./components/Square.jsx"
-import { TURNS, WINNER_COMBOS } from "./constants.js"
-
+import { TURNS } from "./constants.js"
+import { checkWinner } from "./logic/board.js"
+import { WinnerModal } from "./components/WinnerModal.jsx";
+import { checkEndGame } from "./logic/board.js";
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [turn, setTurn] = useState(TURNS.X);
   const [winner, setWinner] = useState(null)
-
-  const checkWinner = (boardToCheck) => {
-    for (let combo of WINNER_COMBOS) {
-      const [a, b, c] = combo
-      if (
-        boardToCheck[a] &&
-        boardToCheck[a] === boardToCheck[b] &&
-        boardToCheck[a] === boardToCheck[c]
-      ) {
-        return boardToCheck[a]
-      }
-    }
-    //If no winner
-    return null
-  }
 
   const resetGame = () => {
     setBoard(Array(9).fill(null))
@@ -29,9 +16,7 @@ function App() {
     setWinner(null)
   }
 
-  const checkEndGame = (newBoard) => {
-    return newBoard.every((square) => square !== null)
-  }
+  
   const updateBoard = (index) => {
     if (board[index] || winner) return
     //We manage turns
@@ -42,7 +27,6 @@ function App() {
     const newBoard = [...board]
     newBoard[index] = turn
     setBoard(newBoard)
-    console.log(board)
 
     const newWinner = checkWinner(newBoard)
 
@@ -88,23 +72,10 @@ function App() {
       </section>
 
       {
-        winner !== null && (
-          <section className="winner">
-            <div className="text">
-              <h2>{
-                winner === false ? "Draw" : `Winner: `
-              }</h2>
-
-              <header className="win">
-                {winner && <Square>{winner}</Square>}
-              </header>
-
-              <footer>
-                <button onClick={resetGame}>Play again</button>
-              </footer>
-            </div>
-          </section>
-        )
+        <WinnerModal 
+          winner={winner}
+          resetGame={resetGame}
+        />
       }
     </main>
 
